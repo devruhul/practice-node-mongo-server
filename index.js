@@ -30,7 +30,6 @@ async function run() {
         app.get('/users', async (req, res) => {
             const cursor = usersCollection.find({});
             const result = await cursor.toArray()
-            console.log('data', result)
             res.json(result)
         })
 
@@ -40,7 +39,22 @@ async function run() {
             const id = req.params.id
             const query = { _id: ObjectId(id) }
             const result = await usersCollection.findOne(query)
-            console.log('updated user id', result)
+            res.json(result)
+        })
+
+        // UPDATE API by using put method
+        app.put('/users/:id', async (req, res) =>{
+            const id = req.params.id
+            const updatedUser = req.body
+            const filter = { _id:ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                name: updatedUser.name,
+                email: updatedUser.email
+                },
+            };
+            const result = await usersCollection.updateOne(filter, updateDoc, options)
             res.json(result)
         })
 
@@ -49,7 +63,6 @@ async function run() {
             const id = req.params.id
             const query = { _id: ObjectId(id) }
             const result = await usersCollection.deleteOne(query)
-            console.log('data deleted', result)
             res.json(result)
 
         })
